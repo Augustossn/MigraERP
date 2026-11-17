@@ -125,6 +125,8 @@ where c.codigo = 'C-101' and t.codigo = 'CT-101';
 
 Os IDs permanecem e o valor muda de **1500,50** para **1750,75**. Em um lote novo, os `MERGE` usam o código de negócio no `ON` para decidir entre `UPDATE` e `INSERT`. O cliente vem primeiro para resolver a FK do contrato. Repetir a migração de um ID já migrado retorna o resultado anterior, inclusive se um lote posterior atualizou as mesmas chaves.
 
+Para demonstrar uma referência a um cliente já migrado, envie os arquivos de `examples/so-contratos` depois de migrar o lote válido. O CSV de clientes contém só o cabeçalho. O contrato `CT-103` deve validar com a referência ao cliente `C-101` no destino.
+
 ## 4. Transações e concorrência
 
 `Jdbc.transaction` usa uma conexão com `autoCommit=false`. O mesmo `COMMIT` confirma os dois `MERGE` e a mudança para `MIGRADO`. Um erro na conversão do contrato faz `ROLLBACK` da escrita anterior de clientes e preserva o estado `APROVADO`, permitindo nova tentativa. Os SQLs de merge estão em `src/main/resources/sql`; o teste `falhaNoMergeContratoReverteClientePermiteNovaTentativa` provoca o erro alterando um valor no staging diretamente via JDBC, após a aprovação.
