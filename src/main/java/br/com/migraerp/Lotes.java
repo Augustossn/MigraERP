@@ -15,6 +15,7 @@ import java.sql.Types;
 import java.time.Instant;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import static br.com.migraerp.Jdbc.bind;
@@ -85,7 +86,8 @@ class Lotes {
                 Contagem contagem = validarNoBanco(conn, id);
                 double elapsed = (System.nanoTime() - inicio) / 1_000_000.0;
                 Lote lote = get(conn, id);
-                if (lote.validos() != contagem.validos() || lote.invalidos() != contagem.invalidos()) {
+                if (!Objects.equals(lote.validos(), contagem.validos())
+                        || !Objects.equals(lote.invalidos(), contagem.invalidos())) {
                     throw new SQLException("Contagem da procedure diverge do lote");
                 }
                 return new Validacao(lote, elapsed);
