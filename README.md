@@ -194,14 +194,6 @@ Para reproduzir só a falha de migração e o retry, selecione o método de inte
 docker compose --profile test run --rm tests mvn -B -Poracle-it '-Dit.test=MigracaoOracleIT#falhaNoMergeContratoReverteClientePermiteNovaTentativa' verify
 ```
 
-## Decisões para explicar na entrevista
-
-- **Por que validar antes do `MERGE`?** Oracle exige uma fonte estável para cada chave. A janela analítica identifica os duplicados no staging, e o bloqueio da aprovação mantém essas linhas fora do destino.
-- **O que protege o reprocessamento?** `UNIQUE` e o `ON` pela chave do ERP de origem protegem o destino. O estado `MIGRADO` evita repetir efeitos de um lote antigo quando seu pedido HTTP é reenviado.
-- **O que muda vindo de PostgreSQL ou SQL Server?** No Oracle, cheque o serviço da PDB, use as visões `USER_*` e explicite as conversões de número e data. Observe string vazia como `NULL` e a parte de hora no tipo `DATE`.
-- **Por que testar Java e PL/SQL?** Java facilita depurar regras e escrever testes unitários. A validação set-based mantém o volume no Oracle e devolve contagens por parâmetros `OUT`. O teste de paridade reduz o risco de as duas implementações divergirem.
-- **Como melhorar o plano?** Comece pela seletividade e pelos predicados, colete estatísticas e confirme o caminho escolhido pelo otimizador. Compare o benefício das buscas com a manutenção do índice na importação.
-
 ## Referências
 
 - [Oracle Database SQL Language Reference — MERGE](https://docs.oracle.com/en/database/oracle/oracle-database/26/sqlrf/MERGE.html)
