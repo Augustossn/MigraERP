@@ -1,0 +1,6 @@
+codigo,nome,email
+C-DUP,Cliente duplicado A,dup-a@example.test
+C-DUP,Cliente duplicado B,dup-b@example.test
+C-SEM-NOME,,sem-nome@example.test
+C-OK,Cliente válido,ok@example.test
+C-EMAIL,Cliente com email inválido,email-invalido

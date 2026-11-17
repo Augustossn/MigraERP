@@ -1,0 +1,52 @@
+name: migraerp
+
+x-app-env: &app-env
+  SPRING_DATASOURCE_URL: jdbc:oracle:thin:@//oracle:1521/FREEPDB1
+  SPRING_DATASOURCE_USERNAME: migraerp
+  SPRING_DATASOURCE_PASSWORD: ${MIGRAERP_DB_PASSWORD:-MigraerpLocal_2026}
+
+services:
+  oracle:
+    image: gvenzl/oracle-free:23.26.3-slim-faststart
+    environment:
+      ORACLE_PASSWORD: ${ORACLE_PASSWORD:-OracleLocal_2026}
+      APP_USER: migraerp
+      APP_USER_PASSWORD: ${MIGRAERP_DB_PASSWORD:-MigraerpLocal_2026}
+    ports:
+      - "127.0.0.1:${ORACLE_PORT:-1521}:1521"
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+      - ./db:/migraerp-db:ro
+      - ./db/init.sh:/container-entrypoint-initdb.d/01-migraerp.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "healthcheck.sh && test -f /opt/oracle/oradata/.migraerp-ready"]
+      interval: 10s
+      timeout: 5s
+      retries: 24
+      start_period: 60s
+
+  api:
+    build: .
+    environment: *app-env
+    ports:
+      - "127.0.0.1:${API_PORT:-8080}:8080"
+    depends_on:
+      oracle:
+        condition: service_healthy
+
+  tests:
+    profiles: [test]
+    image: maven:3.9.11-eclipse-temurin-21
+    working_dir: /project
+    environment: *app-env
+    volumes:
+      - .:/project
+      - maven-cache:/root/.m2
+    command: ["mvn", "-B", "-Poracle-it", "verify"]
+    depends_on:
+      oracle:
+        condition: service_healthy
+
+volumes:
+  oracle-data:
+  maven-cache:

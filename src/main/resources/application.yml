@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: migraerp
+  datasource:
+    url: jdbc:oracle:thin:@//localhost:1521/FREEPDB1
+    username: migraerp
+    password: ${MIGRAERP_DB_PASSWORD:MigraerpLocal_2026}
+    hikari:
+      maximum-pool-size: 8
+  servlet:
+    multipart:
+      max-file-size: 8MB
+      max-request-size: 17MB
+server:
+  error:
+    include-message: never
