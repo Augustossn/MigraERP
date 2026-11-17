@@ -16,9 +16,15 @@ flowchart LR
 
 ## 1. Subir o projeto
 
-Com Docker Desktop em modo Linux Containers, ou Docker Engine com Compose, abra esta pasta e rode:
+Com Docker Desktop em modo Linux Containers, ou Docker Engine com Compose, abra esta pasta. Gere as senhas locais antes de subir o banco pela primeira vez:
 
 ```powershell
+if (!(Test-Path .env)) {
+    @(
+        "ORACLE_PASSWORD=Db_$([guid]::NewGuid().ToString('N'))"
+        "MIGRAERP_DB_PASSWORD=App_$([guid]::NewGuid().ToString('N'))"
+    ) | Set-Content -Encoding ascii .env
+}
 docker compose up -d --build --wait
 docker compose ps
 docker compose logs oracle
@@ -32,11 +38,11 @@ docker compose logs api
 | Serviço da PDB | `FREEPDB1` |
 | URL JDBC | `jdbc:oracle:thin:@//localhost:1521/FREEPDB1` |
 | Usuário da aplicação | `migraerp` |
-| Senha local de demonstração | `MigraerpLocal_2026` |
+| Senha da aplicação | `MIGRAERP_DB_PASSWORD` do arquivo `.env` local |
 
 O volume persiste as tabelas entre reinicializações. No primeiro boot, a imagem cria o usuário na PDB e executa `db/install.sql`. O healthcheck espera o banco e a instalação do schema. As portas ficam vinculadas a `127.0.0.1`. A aprovação nesta API local é uma transição de estado, sem autenticação.
 
-Defina `ORACLE_PASSWORD` e `MIGRAERP_DB_PASSWORD` em um arquivo `.env` antes da primeira inicialização se quiser trocar as senhas de demonstração. `ORACLE_PORT` e `API_PORT` ajustam as portas no host. Para rodar e depurar o Java na IDE com JDK 21 e Maven 3.9, suba apenas o serviço `oracle` e execute `mvn spring-boot:run`. A aplicação lê `SPRING_DATASOURCE_URL` e `SPRING_DATASOURCE_PASSWORD` se você alterar a conexão.
+O Git ignora o arquivo `.env`. Se o volume do Oracle já foi inicializado, alterar o `.env` só muda a configuração dos contêineres. A senha precisa ser alterada no banco também. `ORACLE_PORT` e `API_PORT` ajustam as portas no host. Para rodar o Java na IDE, configure `MIGRAERP_DB_PASSWORD` no ambiente da execução com o valor do `.env`, suba apenas o serviço `oracle` e execute `mvn spring-boot:run` com JDK 21 e Maven 3.9. Use `SPRING_DATASOURCE_URL` se alterar a porta do Oracle.
 
 ```powershell
 docker compose up -d --wait oracle
