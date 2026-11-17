@@ -11,12 +11,12 @@ Push-Location $projeto
 try {
     $geracao = docker compose exec -T oracle bash /migraerp-db/sql.sh '@/migraerp-db/perf-dados.sql'
     if ($LASTEXITCODE -ne 0) { throw ($geracao -join [Environment]::NewLine) }
-    $lote = [regex]::Match(($geracao -join ' '), 'LOTE_PERF=(d+)').Groups[1].Value
+    $lote = [regex]::Match(($geracao -join ' '), 'LOTE_PERF=([0-9]+)').Groups[1].Value
     if (-not $lote) { throw 'O Oracle nao retornou o identificador do lote.' }
 
     "MigraERP | $(Get-Date -Format o) | lote $lote | 100000 registros" |
         Tee-Object -FilePath $saidaCompleta
-    $url = "$Api/api/lotes/$lote/validar"
+    $url = "$($Api.TrimEnd('/'))/api/lotes/$lote/validar"
     $resultados = @{JAVA = @(); PLSQL = @()}
     $esperado = '99350/650'
 
