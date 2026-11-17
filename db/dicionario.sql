@@ -1,3 +1,5 @@
+whenever oserror exit failure
+whenever sqlerror exit sql.sqlcode
 set linesize 180 pagesize 100
 column table_name format a20
 column constraint_name format a25
@@ -28,5 +30,10 @@ from user_ind_columns
 where table_name in ('CLIENTE', 'CONTRATO', 'STAGING_REGISTRO', 'ERRO_VALIDACAO')
 order by table_name, index_name, column_position;
 
+select object_name, object_type, status
+from user_objects
+where object_type in ('VIEW', 'PROCEDURE')
+order by object_type, object_name;
+
 select name, type, line, position, text from user_errors order by name, sequence;
-exit
+exit success
