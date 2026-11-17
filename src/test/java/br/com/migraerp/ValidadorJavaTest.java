@@ -8,6 +8,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ValidadorJavaTest {
     @Test
+    void aceitaContratoReferenciadoPorClienteValidoNoMesmoLote() {
+        var cliente = new ValidadorJava.Linha("CLIENTE", 2, "C-1", "Ana", "ana@example.test",
+                null, null, null, null, null, false);
+        var contrato = new ValidadorJava.Linha("CONTRATO", 2, "CT-1", null, null,
+                "C-1", "2026-01-01", "2026-12-31", "25.00", null, false);
+
+        var resultado = ValidadorJava.validar(List.of(cliente, contrato));
+        assertThat(resultado.validos()).isEqualTo(2);
+        assertThat(resultado.invalidos()).isZero();
+        assertThat(resultado.erros()).isEmpty();
+    }
+
+    @Test
     void contaLinhasInvalidasUmaVezMesmoComVariosErros() {
         var invalida = new ValidadorJava.Linha("CONTRATO", 2, "CT-1", null, null,
                 "AUSENTE", "2026-02-29", "2026-12-31", "0", null, false);
