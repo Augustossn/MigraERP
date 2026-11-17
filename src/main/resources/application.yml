@@ -4,7 +4,6 @@ spring:
   datasource:
     url: jdbc:oracle:thin:@//localhost:1521/FREEPDB1
     username: migraerp
-    password: ${MIGRAERP_DB_PASSWORD}
     hikari:
       maximum-pool-size: 8
   servlet:

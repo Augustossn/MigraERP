@@ -1,17 +1,17 @@
 name: migraerp
 
 x-app-env: &app-env
-  SPRING_DATASOURCE_URL: jdbc:oracle:thin:@//oracle:1521/FREEPDB1
-  SPRING_DATASOURCE_USERNAME: migraerp
-  SPRING_DATASOURCE_PASSWORD: ${MIGRAERP_DB_PASSWORD:?Defina MIGRAERP_DB_PASSWORD no arquivo .env}
+  - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@//oracle:1521/FREEPDB1
+  - SPRING_DATASOURCE_USERNAME=migraerp
+  - SPRING_DATASOURCE_PASSWORD
 
 services:
   oracle:
     image: gvenzl/oracle-free:23.26.3-slim-faststart
     environment:
-      ORACLE_PASSWORD: ${ORACLE_PASSWORD:?Defina ORACLE_PASSWORD no arquivo .env}
-      APP_USER: migraerp
-      APP_USER_PASSWORD: ${MIGRAERP_DB_PASSWORD:?Defina MIGRAERP_DB_PASSWORD no arquivo .env}
+      - ORACLE_PASSWORD
+      - APP_USER=migraerp
+      - APP_USER_PASSWORD
     ports:
       - "127.0.0.1:${ORACLE_PORT:-1521}:1521"
     volumes:
